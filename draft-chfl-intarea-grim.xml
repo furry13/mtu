@@ -94,7 +94,7 @@ TBA
     <section>
       <name>Introduction</name>
 <t>
-The determination of an optimal Maximum Transmission Unit (MTU) for end-to-end communication remains a persistent challenge even today.
+Determining a suitable maximum packet size (known as the Path MTU, PMTU) for end-to-end communication remains a persistent challenge even today.
 </t>
 
 <t>
