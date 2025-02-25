@@ -146,7 +146,7 @@ Terminology
 <t>Legacy link: a link which doesn't supports large MTU (a link with MTU equal or lower than  1500 bytes).</t>
 <t>Link MTU: The link Maximum Transmission Unit (MTU) is the size in bytes of the largest IP packet, including the IP header and payload, that can be transmitted over a link. See <xref target="RFC8899"/>.</t>
 <t>MAX_PLPMTU: the largest size of the packet the sender will attempt to use (see  <xref target="RFC8899"/>).</t>
-<t>Least Common MTU: a new term, introduced by this document, referring to a MTU which the sender uses until an explicit signal is received, indicating that a larger MTU can be used.</t>
+<t>Default MTU: a new term, introduced by this document, referring to a MTU which the sender uses until an explicit signal is received, indicating that a larger MTU can be used.</t>
 
 </section>
 
@@ -240,7 +240,7 @@ When present in a Neighbor Adevrtisement message, it indicates that the sender s
 </ul>
 
 <t>Legacy nodes ignore the LMTU option.</t>
-<t>For large MTU links, the router SHOULD include both MTU options: new LMTU option to indicate to the updated nodes the large MTU to use onlink, and the MTU option defined in Section 4.6.4 of <xref target="RFC4861"/>. The legacy hosts ignore the former and use the latter as the link MTU. The updated hosts use the old MTU option as the Least Common MTU and include the LMTU option (or set the bit????) in NA.</t>
+<t>For large MTU links, the router SHOULD include both MTU options: new LMTU option to indicate to the updated nodes the large MTU to use onlink, and the MTU option defined in Section 4.6.4 of <xref target="RFC4861"/>. The legacy hosts ignore the former and use the latter as the link MTU. The updated hosts use the old MTU option as the Default MTU and include the LMTU option (or set the bit????) in NA.</t>
 
 <t>QUESTION: how to communicate large MTU withing a domain? RIOs can't contain MTU. Ideas:
 1) hosts can use the LMTU option as a signal that it should be tried for destinations withing RIOs (either HbH option or transport-layer probing).
@@ -254,14 +254,14 @@ When present in a Neighbor Adevrtisement message, it indicates that the sender s
 <section><name>Legacy and Updated Hosts on a legacy link</name>
 <t>
 The router ether doesn't inlcude any MTU options, or only includes the legacy MTU option.
-The updated host processes the legacy option and uses that MTU value, or, if it's not present, a link MTU  as a Least Common MTU to communicate to all onlink hosts and to offlink destinations.
+The updated host processes the legacy option and uses that MTU value, or, if it's not present, a link MTU  as Default MTU to communicate to all onlink hosts and to offlink destinations.
 </t>
 </section>
 
 <section><name>Legacy and Updated Hosts on a large MTU link</name>
 <t>
 The router includes two options. The legacy host ignores the LMTU option and use the MTU option as a link MTU. The updated host processes the LMTU option but initially is not going to use it for any destinations.
-Instead it will be using the MTU option as a Least Common MTU as an initial MTU for all new communications.
+Instead it will be using the MTU option as the Default MTU as an initial MTU for all new communications.
 When sending an NA to the legacy host, the updated host includes the LMTU option into the NA.
 The legacy host ignores the option, and both hosts use the legacy MTU.
 </t>
@@ -276,7 +276,7 @@ Similar to Legacy and Updated Hosts on a legacy link.
 <section><name>Two Updated Hosts on a large MTU link</name>
 <t>
 The router includes two options. The updated hosts processes the LMTU option but initially is not going to use it for any destinations.
-Instead it will be using the MTU option as a Least Common MTU as an initial MTU for all new communications.
+Instead it will be using the MTU option as the Default MTU as an initial MTU for all new communications.
 When sending an NA to an onlink neighbor, the updated host includes the LMTU option into the NA.
 The neighbor processes the option, updates the Neighbor Cache with the LMTU value, and uses it when communicating with the host advertizing the large MTU.
 </t>
