@@ -94,7 +94,7 @@ TBA
     <section>
       <name>Introduction</name>
 <t>
-Determining a suitable maximum packet size (known as the Path MTU, PMTU) for end-to-end communication remains a persistent challenge even today.
+Determining a suitable maximum packet size (known as the Path MTU, PMTU) for end-to-end communication remains a persistent challenge in the current Internet.
 </t>
 
 <t>
@@ -109,7 +109,7 @@ Currently, endpoints and applications employ two primary MTU management approach
 <t>
 Interface-based MTU with Path MTU Discovery (PMTUD): This approach utilizes the MTU configured on the network interface, relying on PMTUD to dynamically reduce packet sizes when necessary.
 In Ethernet networks, this typically defaults to 1500 bytes. 
-However, network administrators often advertise reduced MTU in RAs  to mitigate potential MTU issues, particularly in networks employing tunnels.
+However, network administrators often advertise reduced MTU in RAs to mitigate potential MTU issues, particularly in networks employing tunnels.
 </t>
 </li>
 <li>
@@ -140,10 +140,10 @@ At the same time the Path MTU Discovery remains fragile and unreliable, as discu
 Terminology
 </name>
 <t>Legacy node: a node which does not implement protocol changes or algorithms proposed by this document.</t>
-<t>Updated node: a node which supports large MTU and implements protocol changes and/or algorithms proposed by this document.  </t>
+<t>Updated node: a node which supports Large MTUs and implements protocol changes and/or algorithms proposed by this document.  </t>
 <t>Large MTU: MTU above 1500 bytes.</t>
-<t>Large MTU link: a link which supports large MTU</t>
-<t>Legacy link: a link which doesn't supports large MTU (a link with MTU equal or lower than  1500 bytes).</t>
+<t>Large MTU link: a link which supports Large MTU</t>
+<t>Legacy link: a link which doesn't supports Large MTU (a link with MTU equal or lower than  1500 bytes).</t>
 <t>Link MTU: The link Maximum Transmission Unit (MTU) is the size in bytes of the largest IP packet, including the IP header and payload, that can be transmitted over a link. See <xref target="RFC8899"/>.</t>
 <t>MAX_PLPMTU: the largest size of the packet the sender will attempt to use (see  <xref target="RFC8899"/>).</t>
 <t>Default MTU: a new term, introduced by this document, referring to a MTU which the sender uses until an explicit signal is received, indicating that a larger MTU can be used.</t>
@@ -183,8 +183,7 @@ When a node configures a large MTU on its interface (either through an MTU RA op
 <ul>
 <li>
 <t>
-Incremental deployment: the legacy and update nodes MUST be able to coexist on the same large MTU link or legacy link. The solution MUST allow an oper
-ator to migrate individual links and individual nodes to support the large MTU.
+Incremental deployment: the legacy and update nodes MUST be able to coexist on the same large MTU link or legacy link. The solution MUST allow an operator to migrate individual links and individual nodes to support the large MTU.
 </t>
 </li>
 <li>
@@ -224,7 +223,7 @@ Two updated nodes MUST select the largest possible MTU for the path.
 <name>Modification to the Neighbor Discovery</name>
 
 
-<t>This document introduces a new Neighbor Discovery option, called LMTU (large MTU)</t>
+<t>This document introduces a new Neighbor Discovery option, called LMTU (Large MTU).  This option may be used in Router Advertisement and Neighbor Adevrtisement messages.</t>
 <ul>
 <li>
 <t>
@@ -235,15 +234,17 @@ When present in a Router Advertisement message, it indicates to all updated node
 <t>
 When present in a Neighbor Adevrtisement message, it indicates that the sender supports large MTU. If the receiver is an updated node, it can use the value as an MTU when communicating with the sender.
 (Jen: or shall we just use a bit in NA to indicate that the node supports LMTU advertized by the router??)
+(Bob: or allowing the size might allow different MTUs between different nodes, maybe good or bad...)
 </t>
 </li>
 </ul>
 
 <t>Legacy nodes ignore the LMTU option.</t>
-<t>For large MTU links, the router SHOULD include both MTU options: new LMTU option to indicate to the updated nodes the large MTU to use onlink, and the MTU option defined in Section 4.6.4 of <xref target="RFC4861"/>. The legacy hosts ignore the former and use the latter as the link MTU. The updated hosts use the old MTU option as the Default MTU and include the LMTU option (or set the bit????) in NA.</t>
+<t>For large MTU links, the router SHOULD include both MTU options: new LMTU option to indicate to the updated nodes the large MTU to use onlink, and the MTU option defined in Section 4.6.4 of <xref target="RFC4861"/>. The legacy hosts will ignore the new LMTU option and use the latter as the link MTU. The updated hosts use the old MTU option as the Default MTU and include the LMTU option (or set the bit????) in NA.</t>
 
 <t>QUESTION: how to communicate large MTU withing a domain? RIOs can't contain MTU. Ideas:
 1) hosts can use the LMTU option as a signal that it should be tried for destinations withing RIOs (either HbH option or transport-layer probing).
+2) Bob:  I suppose the presence of the LMTU option in the RA could indicate something about it's outgoing links.   
 </t>
 
 </section>
@@ -253,15 +254,15 @@ When present in a Neighbor Adevrtisement message, it indicates that the sender s
 
 <section><name>Legacy and Updated Hosts on a legacy link</name>
 <t>
-The router ether doesn't inlcude any MTU options, or only includes the legacy MTU option.
-The updated host processes the legacy option and uses that MTU value, or, if it's not present, a link MTU  as Default MTU to communicate to all onlink hosts and to offlink destinations.
+The router ether doesn't include any MTU options, or only includes the legacy MTU option. (Bob:  Describe this as RFC4861 MTU options??)
+The updated host processes the legacy MTU option and uses that MTU value, or, if it's not present, a link MTU  as Default MTU to communicate to all onlink hosts and to offlink destinations.
 </t>
 </section>
 
 <section><name>Legacy and Updated Hosts on a large MTU link</name>
 <t>
-The router includes two options. The legacy host ignores the LMTU option and use the MTU option as a link MTU. The updated host processes the LMTU option but initially is not going to use it for any destinations.
-Instead it will be using the MTU option as the Default MTU as an initial MTU for all new communications.
+The router includes both options. The legacy host ignores the LMTU option and use the MTU option as a link MTU. The updated host processes the LMTU option but initially is not going to use it for any destinations.
+Instead it will be using the MTU option value as the Default MTU as an initial MTU for all new communications.
 When sending an NA to the legacy host, the updated host includes the LMTU option into the NA.
 The legacy host ignores the option, and both hosts use the legacy MTU.
 </t>
@@ -270,6 +271,7 @@ The legacy host ignores the option, and both hosts use the legacy MTU.
 <section><name>Two Updated Hosts on a legacy MTU link</name>
 <t>
 Similar to Legacy and Updated Hosts on a legacy link.
+	(Bob:  I think this means that can't use Large MTUs unless the Router says (by including the LMTU option) it thinks the link is capable.  Correct?)
 </t>
 </section>
 
@@ -286,6 +288,8 @@ The neighbor processes the option, updates the Neighbor Cache with the LMTU valu
 <t>
 The host will be using the legacy MTU value advertized by the router as the initial MTU value, until some other mechanisms provide an explicit signal that a large MTU can be used.
 Such mechanisms can include the values between the legacy and the Large MTU in probing. This allows use the large MTU if the path supports it.
+	(Bob:  Perhaps an extension to the LTMU option, or q new option to say something about the routers attached links.)
+	(Bob:  Maybe it's time for hosts to be learing about non-attached links....)
 </t>
 </section>
 
